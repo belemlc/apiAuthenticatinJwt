@@ -17,21 +17,30 @@ class PetController extends Controller {
             
             userSchema.findOne(query, (err, user) => {
                 if (err) {
-                    res.status(401).json('Error: ', err);
+                    res.status(401).json({
+                        success: false,
+                        error: err
+                    });
                 }
                 if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
                             let payload = {id: user.id};
                             let token = jwt.sign(payload, cfg.jtwSecret, {expiresIn: '60s'});
-                            res.status(200).json({token: `BEARER ${token}`});
+                            res.status(200).json({
+                                success: true,
+                                token: `BEARER ${token}`
+                            });
                         } else {
                             return err;
                         }
                     });
                 } else {
                     console.log('findOne error');
-                    res.status(401).json('Error: ', err);
+                    res.status(401).json({
+                        success: false,
+                        error: err
+                    });
                 }
             });
         }
